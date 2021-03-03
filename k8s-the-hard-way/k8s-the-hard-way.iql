@@ -1,0 +1,81 @@
+--
+-- create VPC 
+--
+INSERT INTO compute.networks
+(
+ project,
+ data$name,
+ data$autoCreateSubnetworks,
+ data$routingConfig
+) 
+SELECT
+'{{ .global.project }}',
+'{{ .network.name }}',
+{{ .network.autoCreateSubnetworks }},
+'{{ .network.routingConfig }}';
+
+--
+-- create subnetwork
+--
+INSERT INTO compute.subnetworks
+(
+ project,
+ region,
+ data$name,
+ data$network,
+ data$ipCidrRange,
+ data$privateIpGoogleAccess
+) 
+SELECT
+/* TODO */
+;
+
+--
+-- create firewall rules
+--
+INSERT INTO compute.firewalls
+(
+ project,
+ data$name,
+ data$network,
+ data$direction,
+ data$sourceRanges,
+ data$allowed
+) 
+SELECT
+/* TODO */
+;
+
+--
+-- create public IP address
+--
+INSERT INTO compute.addresses
+(
+ project,
+ region,
+ data$name
+) 
+SELECT
+/* TODO */
+;
+
+--
+-- create instances
+--
+INSERT INTO compute.instances 
+(
+ zone,
+ project,
+ data$name,
+ data$machineType,
+ data$canIpForward,
+ data$deletionProtection,
+ data$scheduling,
+ data$networkInterfaces,
+ data$disks,
+ data$serviceAccounts,
+ data$tags
+) 
+SELECT
+/* TODO */
+;
