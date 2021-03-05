@@ -1,12 +1,12 @@
 --
 -- create VPC 
 --
-INSERT INTO compute.networks
+INSERT /*+ AWAIT  */ INTO compute.networks
 (
  project,
- data$name,
- data$autoCreateSubnetworks,
- data$routingConfig
+ data__name,
+ data__autoCreateSubnetworks,
+ data__routingConfig
 ) 
 SELECT
 '{{ .global.project }}',
@@ -17,65 +17,87 @@ SELECT
 --
 -- create subnetwork
 --
-INSERT INTO compute.subnetworks
+INSERT /*+ AWAIT  */ INTO compute.subnetworks
 (
  project,
  region,
- data$name,
- data$network,
- data$ipCidrRange,
- data$privateIpGoogleAccess
+ data__name,
+ data__network,
+ data__ipCidrRange,
+ data__privateIpGoogleAccess
 ) 
 SELECT
-/* TODO */
-;
-
---
--- create firewall rules
---
-INSERT INTO compute.firewalls
-(
- project,
- data$name,
- data$network,
- data$direction,
- data$sourceRanges,
- data$allowed
-) 
-SELECT
-/* TODO */
-;
+'{{ .global.project }}',
+'{{ .global.region }}',
+'{{ .subnetwork.name }}',
+'{{ .subnetwork.network }}',
+'{{ .subnetwork.ipCidrRange }}',
+'{{ .subnetwork.privateIpGoogleAccess }}';
 
 --
 -- create public IP address
 --
-INSERT INTO compute.addresses
+INSERT /*+ AWAIT  */ INTO compute.addresses
 (
  project,
  region,
- data$name
+ data__name
 ) 
 SELECT
-/* TODO */
-;
+'{{ .global.project }}',
+'{{ .global.region }}',
+'{{ .address.name }}';
+
+--
+-- create firewall rules
+--
+{{range .firewalls}}
+INSERT /*+ AWAIT  */ INTO compute.firewalls
+(
+ project,
+ data__name,
+ data__network,
+ data__direction,
+ data__sourceRanges,
+ data__allowed
+) 
+SELECT
+'{{ .global.project }}',
+'{{.name}}',
+'{{.network}}',
+'{{.direction}}',
+'{{.sourceRanges}}',
+'{{.allowed}}';
+{{end}}
 
 --
 -- create instances
 --
-INSERT INTO compute.instances 
-(
- zone,
- project,
- data$name,
- data$machineType,
- data$canIpForward,
- data$deletionProtection,
- data$scheduling,
- data$networkInterfaces,
- data$disks,
- data$serviceAccounts,
- data$tags
-) 
-SELECT
-/* TODO */
-;
+{{range .instances}}
+ INSERT /*+ AWAIT  */ INTO compute.instances 
+ (
+  zone,
+  project,
+  data__name,
+  data__machineType,
+  data__canIpForward,
+  data__deletionProtection,
+  data__scheduling,
+  data__networkInterfaces,
+  data__disks,
+  data__serviceAccounts,
+  data__tags
+ ) 
+ SELECT
+'{{ .global.zone }}',
+'{{ .global.project }}',
+'{{.name}}',
+'{{.machineType}}',
+'{{.canIpForward}}',
+'{{.deletionProtection}}',
+'{{.scheduling}}',
+'{{.networkInterfaces}}',
+'{{.disks}}',
+'{{.serviceAccounts}}',
+'{{.tags}}';
+{{end}}
