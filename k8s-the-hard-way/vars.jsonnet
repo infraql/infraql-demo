@@ -7,6 +7,7 @@ local self_link_base = 'https://compute.googleapis.com/compute/v1/projects/' + p
 local self_link_global = self_link_base + 'global/';
 local self_link_regional = self_link_base + 'regions/' + region + '/';
 local self_link_zonal = self_link_base + 'zones/' + zone + '/';
+local nw_name = name + '-vpc';
 local sourceImage = 'https://compute.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-2004-lts';
 local diskSizeGb = '10';
 
@@ -29,18 +30,22 @@ local diskSizeGb = '10';
   }, 
   // controller instance config
   controller_instance: {
-     instance +
-     metadata: {},
-     tags: {items: [name, 'controller']}
+     instance +:
+     {
+       metadata: {},
+       tags: {items: [name, 'controller']}
+     }
   },
   // worker instance config
   worker_instance: {
-     instance +
-     tags: {items: [name, 'worker']}
+     instance +:
+     {
+       tags: {items: [name, 'worker']}
+     }
   },  
   // network
   network: {
-    autoCreateSubnetworks: false
+    autoCreateSubnetworks: false,
     name: name + '-vpc',
     routingConfig: {routingMode: 'REGIONAL'}
   },
@@ -48,7 +53,7 @@ local diskSizeGb = '10';
   subnetwork: {
     ipCidrRange: '10.240.0.0/24',
     name: name + '-subnet',
-    network: self_link_global + 'networks/' + network.name,
+    network: self_link_global + 'networks/' + nw_name,
     privateIpGoogleAccess: false
   },
   // public IP addr
@@ -61,51 +66,62 @@ local diskSizeGb = '10';
       allowed: [{IPProtocol: 'tcp'}, {IPProtocol: 'udp'}, {IPProtocol: 'icmp'}], 
       direction: 'INGRESS', 
       name: name + '-allow-internal-fw', 
-      network: self_link_global + 'networks/' + network.name,
+      network: self_link_global + 'networks/' + nw_name,
       sourceRanges: ['10.240.0.0/24', '10.200.0.0/16']
     },
     {
       allowed: [{IPProtocol: 'tcp', ports: ['22']}, {IPProtocol: 'tcp', ports: ['6443']},{IPProtocol: 'icmp'}],
       direction: 'INGRESS', 
       name: name + '-allow-external-fw', 
-      network: self_link_global + 'networks/' + network.name,
+      network: self_link_global + 'networks/' + nw_name,
       sourceRanges: ['0.0.0.0/0']
     }
   ],
   instances: [
     {
-      controller_instance +
-      networkInterfaces[0].networkIP = '10.240.0.10' +
-      name: 'controller-0'
+      controller_instance +:
+      { 
+        name: 'controller-0',
+        networkInterfaces: [ { networkIP: '10.240.0.10' } ] 
+      }
     },
     {
-      controller_instance +
-      networkInterfaces[0].networkIP = '10.240.0.11' +
-      name: 'controller-1',
-      
+      controller_instance +:
+      {
+        name: 'controller-1',
+        networkInterfaces: [ { networkIP: '10.240.0.11' } ]
+      }
     },
     {
-      controller_instance +
-      networkInterfaces[0].networkIP = '10.240.0.12' +
-      name: 'controller-2',
+      controller_instance +:
+      {
+        name: 'controller-2',
+        networkInterfaces: [ { networkIP: '10.240.0.12' } ]
+      }
     },
     {
-      worker_instance +
-      networkInterfaces[0].networkIP = '10.240.0.20' +
-      name: 'worker-0',
-      metadata: {items: [{key: 'pod-cidr', value: '10.200.0.0/24'}]}
+      worker_instance +:
+      {
+        name: 'worker-0',
+        metadata: {items: [{key: 'pod-cidr', value: '10.200.0.0/24'}]},
+        networkInterfaces: [ { networkIP: '10.240.0.20' } ]
+      }
     },
     {
-      worker_instance +
-      networkInterfaces[0].networkIP = '10.240.0.21' +
-      name: 'worker-1',
-      metadata: {items: [{key: 'pod-cidr', value: '10.200.1.0/24'}]}
+      worker_instance +:
+      {
+        name: 'worker-1',
+        metadata: {items: [{key: 'pod-cidr', value: '10.200.1.0/24'}]},
+        networkInterfaces: [ { networkIP: '10.240.0.21' } ]
+      }
     },
     {
-      worker_instance +
-      networkInterfaces[0].networkIP = '10.240.0.22' +
-      name: 'worker-2',
-      metadata: {items: [{key: 'pod-cidr', value: '10.200.2.0/24'}]}  
+      worker_instance +:
+      {
+        name: 'worker-2',
+        metadata: {items: [{key: 'pod-cidr', value: '10.200.2.0/24'}]},
+        networkInterfaces: [ { networkIP: '10.240.0.22' } ]
+      }
     }
   ]
 }
