@@ -1,1 +1,0 @@
-infraql.exe exec -i k8s-the-hard-way.iql --iqldata vars.jsonnet --keyfilepath c:\tmp\infraql-demo.json

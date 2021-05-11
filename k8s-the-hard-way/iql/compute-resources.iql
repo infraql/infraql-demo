@@ -37,7 +37,7 @@ SELECT
 '{{ .subnetwork.name }}',
 '{{ .subnetwork.network }}',
 '{{ .subnetwork.ipCidrRange }}',
-'{{ .subnetwork.privateIpGoogleAccess }}';
+{{ .subnetwork.privateIpGoogleAccess }};
 
 --
 -- create public IP address
@@ -67,7 +67,7 @@ INSERT /*+ AWAIT  */ INTO compute.firewalls
  data__allowed
 ) 
 SELECT
-'{{ .global.project }}',
+'{{.project}}',
 '{{.name}}',
 '{{.network}}',
 '{{.direction}}',
@@ -79,7 +79,7 @@ SELECT
 -- create instances
 --
 {{range .instances}}
- INSERT /*+ AWAIT  */ INTO compute.instances 
+ INSERT INTO compute.instances 
  (
   zone,
   project,
@@ -94,12 +94,12 @@ SELECT
   data__tags
  ) 
  SELECT
-'{{ .global.zone }}',
-'{{ .global.project }}',
+'{{.zone}}',
+'{{.project}}',
 '{{.name}}',
 '{{.machineType}}',
-'{{.canIpForward}}',
-'{{.deletionProtection}}',
+{{.canIpForward}},
+{{.deletionProtection}},
 '{{.scheduling}}',
 '{{.networkInterfaces}}',
 '{{.disks}}',

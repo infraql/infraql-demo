@@ -1,2 +1,4 @@
 
 .infraql/
+*.tmp
+*-TEMPLATED.iql
