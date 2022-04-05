@@ -1,5 +1,7 @@
 # InfraQL - Infrastructure as SQL
 
+> __*This repository has been archived.  The active projects are now located at [StackQL](https://github.com/stackql)*__
+
 ```
 
 ██╗███╗   ██╗███████╗██████╗  █████╗  ██████╗ ██╗         ██╗ ██╗  
